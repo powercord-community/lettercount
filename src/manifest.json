@@ -1,9 +1,9 @@
 {
-    "name": "Letter Count",
-    "version": "1.0.0",
-    "description": "Show a letter counter in the bottom right of the client",
+    "name": "Letter Counter",
+    "version": "1.0.1",
+    "description": "Show a letter counter above the channel chat area",
     "author": "Nevulo",
     "license": "MIT",
-    "repo": "Nevulo/pc-lettercount"
+    "repo": "https://github.com/Nevvulo/pc-lettercount"
   }
   
