@@ -1,0 +1,9 @@
+{
+    "name": "Letter Count",
+    "version": "1.0.0",
+    "description": "Show a letter counter in the bottom right of the client",
+    "author": "Nevulo",
+    "license": "MIT",
+    "repo": "Nevulo/pc-lettercount"
+  }
+  
