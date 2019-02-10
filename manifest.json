@@ -1,6 +1,6 @@
 {
     "name": "Letter Counter",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "description": "Show a letter counter above the channel chat area",
     "author": "Nevulo",
     "license": "MIT",
