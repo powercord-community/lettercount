@@ -1,11 +1,11 @@
-const Plugin = require('powercord/Plugin');
+const { Plugin } = require('powercord/entities');
 const { inject: pcInject } = require('powercord/injector');
 const { waitFor, getOwnerInstance, createElement } = require('powercord/util');
 const { getModule, constants } = require('powercord/webpack');
 const { resolve } = require('path');
 
 module.exports = class LetterCount extends Plugin {
-  async start () {
+  async startPlugin () {
     this.loadCSS(resolve(__dirname, 'style.scss'));
     await waitFor('.channelTextArea-rNsIhG');
 
@@ -35,9 +35,8 @@ module.exports = class LetterCount extends Plugin {
       );
     };
 
-    const update = () => {
-      updateInstance();
-      const len = this.instance.props.value.length;
+    const update = (instance) => {
+      const len = instance.props.value.length;
       if (len > 2000) {
         getModule([ 'ComponentDispatch' ]).ComponentDispatch.dispatch(constants.ComponentActions.SHAKE_APP, {
           duration: 100,
@@ -47,7 +46,6 @@ module.exports = class LetterCount extends Plugin {
       } else {
         document.getElementsByClassName('powercord-lettercount')[0].classList.remove('powercord-lettercount-error');
       }
-      document.getElementsByClassName('powercord-lettercount-value')[0].innerHTML = len;
     };
 
     inject();
@@ -59,13 +57,17 @@ module.exports = class LetterCount extends Plugin {
       }
     });
 
-    await waitFor('.powercord-lettercount');
-    pcInject('pc-lettercount', instancePrototype, 'handleKeyDown', async () => {
-      update();
+    pcInject('pc-lettercount', instancePrototype, 'handleOnChange', () => {
+      setTimeout(() => {
+        updateInstance();
+        document.getElementsByClassName('powercord-lettercount-value')[0].innerHTML = document.getElementsByClassName('channelTextArea-rNsIhG')[0].children[0].children[2].value.length;
+        update(this.instance);
+      }, 1);
     });
+    this.instance.componentDidMount();
   }
 
-  unload () {
+  pluginWillUnload () {
     this.unloadCSS();
     Array.from(document.querySelectorAll('.powercord-lettercount')).map(c => c.parentNode).forEach(c => {
       c.innerHTML = c._originalInnerHTML;
