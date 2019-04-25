@@ -1,11 +1,12 @@
 const { Plugin } = require('powercord/entities');
-const { inject: pcInject } = require('powercord/injector');
+const { inject } = require('powercord/injector');
 const { waitFor, getOwnerInstance, createElement } = require('powercord/util');
 const { getModule, constants } = require('powercord/webpack');
 const { resolve } = require('path');
 
 module.exports = class LetterCount extends Plugin {
   async startPlugin () {
+    const { ComponentDispatch } = getModule([ 'ComponentDispatch' ]);
     this.loadCSS(resolve(__dirname, 'style.scss'));
     await waitFor('.channelTextArea-rNsIhG');
 
@@ -14,7 +15,7 @@ module.exports = class LetterCount extends Plugin {
     const instancePrototype = Object.getPrototypeOf(updateInstance());
     updateInstance();
 
-    const inject = () => {
+    const injectCounter = () => {
       const textarea = document.getElementsByClassName('channelTextArea-rNsIhG')[0];
       textarea._originalInnerHTML = textarea.innerHTML;
       const elm = createElement('div', {
@@ -24,13 +25,13 @@ module.exports = class LetterCount extends Plugin {
       elm.append(
         createElement('div', {
           className: 'powercord-lettercount-value',
-          innerHTML: `${this.instance.props.value.length || 0}`
+          innerHTML: `<strong>${this.instance.props.value.length || 0}</strong>`
         })
       );
       elm.append(
         createElement('div', {
           className: 'powercord-lettercount-maxvalue',
-          innerHTML: '/ 2000'
+          innerHTML: ' / 2000'
         })
       );
     };
@@ -38,7 +39,7 @@ module.exports = class LetterCount extends Plugin {
     const update = (instance) => {
       const len = instance.props.value.length;
       if (len > 2000) {
-        getModule([ 'ComponentDispatch' ]).ComponentDispatch.dispatch(constants.ComponentActions.SHAKE_APP, {
+        ComponentDispatch.dispatch(constants.ComponentActions.SHAKE_APP, {
           duration: 100,
           intensity: 3
         });
@@ -48,21 +49,23 @@ module.exports = class LetterCount extends Plugin {
       }
     };
 
-    inject();
-    pcInject('pc-lettercount-mount', instancePrototype, 'componentDidMount', () => {
+    injectCounter();
+    inject('pc-lettercount-mount', instancePrototype, 'componentDidMount', () => {
       const old = this.instance;
       updateInstance();
       if (old.props.channel.id !== this.instance.props.channel.id) {
-        inject();
+        injectCounter();
       }
     });
 
-    pcInject('pc-lettercount', instancePrototype, 'handleOnChange', () => {
-      setTimeout(() => {
+    inject('pc-lettercount', instancePrototype, 'render', (args, res) => {
+      const field = document.querySelector('.powercord-lettercount-value');
+      if (field) {
         updateInstance();
-        document.getElementsByClassName('powercord-lettercount-value')[0].innerHTML = document.getElementsByClassName('channelTextArea-rNsIhG')[0].children[0].children[2].value.length;
+        field.innerHTML = `<strong>${document.querySelector('.channelTextArea-rNsIhG').children[0].children[2].value.length}</strong>`;
         update(this.instance);
-      }, 1);
+      }
+      return res;
     });
     this.instance.componentDidMount();
   }
