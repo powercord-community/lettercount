@@ -63,7 +63,7 @@ module.exports = class LetterCount extends Plugin {
       if (field) {
         updateInstance();
         const val = document.querySelector('.channelTextArea-rNsIhG').children[0].children[2].value;
-        if (val) field.innerHTML = `<strong>${val.length}</strong>`;
+        if (val !== undefined) field.innerHTML = `<strong>${val.length}</strong>`;
         update(this.instance);
       }
       return res;
