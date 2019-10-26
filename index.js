@@ -62,7 +62,8 @@ module.exports = class LetterCount extends Plugin {
       const field = document.querySelector('.powercord-lettercount-value');
       if (field) {
         updateInstance();
-        field.innerHTML = `<strong>${document.querySelector('.channelTextArea-rNsIhG').children[0].children[2].value.length}</strong>`;
+        const val = document.querySelector('.channelTextArea-rNsIhG').children[0].children[2].value;
+        if (val !== undefined) field.innerHTML = `<strong>${val.length}</strong>`;
         update(this.instance);
       }
       return res;
