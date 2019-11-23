@@ -8,24 +8,25 @@ module.exports = class LetterCount extends Plugin {
   async startPlugin () {
     const { ComponentDispatch } = getModule([ 'ComponentDispatch' ]);
     this.loadCSS(resolve(__dirname, 'style.scss'));
-    await waitFor('.channelTextArea-rNsIhG');
+    await waitFor('.channelTextArea-1LDbYG');
 
     const updateInstance = () =>
-      (this.instance = getOwnerInstance(document.querySelector('.channelTextArea-rNsIhG')));
+      (this.instance = getOwnerInstance(document.querySelector('.channelTextArea-1LDbYG')));
     const instancePrototype = Object.getPrototypeOf(updateInstance());
     updateInstance();
 
     const injectCounter = () => {
-      const textarea = document.getElementsByClassName('channelTextArea-rNsIhG')[0];
+      const textarea = document.getElementsByClassName('channelTextArea-1LDbYG')[0];
       textarea._originalInnerHTML = textarea.innerHTML;
       const elm = createElement('div', {
         className: 'powercord-lettercount'
       });
       textarea.parentNode.prepend(elm);
+      const val = this.instance.props.value;
       elm.append(
         createElement('div', {
           className: 'powercord-lettercount-value',
-          innerHTML: `<strong>${this.instance.props.value.length || 0}</strong>`
+          innerHTML: `<strong>${val ? val.length || 0 : 0}</strong>`
         })
       );
       elm.append(
@@ -37,7 +38,8 @@ module.exports = class LetterCount extends Plugin {
     };
 
     const update = (instance) => {
-      const len = instance.props.value.length;
+      const val = instance.props.value;
+      const len = val ? val.length : 0;
       if (len > 2000) {
         ComponentDispatch.dispatch(constants.ComponentActions.SHAKE_APP, {
           duration: 100,
@@ -62,7 +64,7 @@ module.exports = class LetterCount extends Plugin {
       const field = document.querySelector('.powercord-lettercount-value');
       if (field) {
         updateInstance();
-        const val = document.querySelector('.channelTextArea-rNsIhG').children[0].children[2].value;
+        const val = document.querySelector('.channelTextArea-1LDbYG').children[0].children[2].value;
         if (val !== undefined) field.innerHTML = `<strong>${val.length}</strong>`;
         update(this.instance);
       }
