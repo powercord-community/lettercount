@@ -1,13 +1,12 @@
 const { Plugin } = require('powercord/entities');
 const { inject } = require('powercord/injector');
 const { waitFor, getOwnerInstance, createElement } = require('powercord/util');
-const { getModule, constants } = require('powercord/webpack');
-const { resolve } = require('path');
+const { getModule } = require('powercord/webpack');
 
 module.exports = class LetterCount extends Plugin {
-  async startPlugin () {
-    const { ComponentDispatch } = getModule([ 'ComponentDispatch' ]);
-    this.loadCSS(resolve(__dirname, 'style.scss'));
+  async startPlugin() {
+    const { ComponentDispatch } = getModule(['ComponentDispatch'], false);
+    this.loadStylesheet('style.scss');
     await waitFor('.channelTextArea-rNsIhG');
 
     const updateInstance = () =>
@@ -25,7 +24,7 @@ module.exports = class LetterCount extends Plugin {
       elm.append(
         createElement('div', {
           className: 'powercord-lettercount-value',
-          innerHTML: `<strong>${this.instance.props.value.length || 0}</strong>`
+          innerHTML: `<strong>${this.instance.state.textValue.length || 0}</strong>`
         })
       );
       elm.append(
@@ -37,12 +36,9 @@ module.exports = class LetterCount extends Plugin {
     };
 
     const update = (instance) => {
-      const len = instance.props.value.length;
+      const len = instance.state.textValue.length;
       if (len > 2000) {
-        ComponentDispatch.dispatch(constants.ComponentActions.SHAKE_APP, {
-          duration: 100,
-          intensity: 3
-        });
+        //ComponentDispatch.dispatch('SHAKE_APP', { duration: 100, intensity: 3 }) idk why the shake wasn't happening
         document.getElementsByClassName('powercord-lettercount')[0].classList.add('powercord-lettercount-error');
       } else {
         document.getElementsByClassName('powercord-lettercount')[0].classList.remove('powercord-lettercount-error');
@@ -62,7 +58,7 @@ module.exports = class LetterCount extends Plugin {
       const field = document.querySelector('.powercord-lettercount-value');
       if (field) {
         updateInstance();
-        const val = document.querySelector('.channelTextArea-rNsIhG').children[0].children[2].value;
+        const val = this.instance.state.textValue;
         if (val !== undefined) field.innerHTML = `<strong>${val.length}</strong>`;
         update(this.instance);
       }
@@ -71,8 +67,7 @@ module.exports = class LetterCount extends Plugin {
     this.instance.componentDidMount();
   }
 
-  pluginWillUnload () {
-    this.unloadCSS();
+  pluginWillUnload() {
     Array.from(document.querySelectorAll('.powercord-lettercount')).map(c => c.parentNode).forEach(c => {
       c.innerHTML = c._originalInnerHTML;
     });
