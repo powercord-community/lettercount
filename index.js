@@ -38,7 +38,7 @@ module.exports = class LetterCount extends Plugin {
     const update = (instance) => {
       const len = instance.state.textValue.length;
       if (len > 2000) {
-        //ComponentDispatch.dispatch('SHAKE_APP', { duration: 100, intensity: 3 }) idk why the shake wasn't happening
+        ComponentDispatch.dispatch('SHAKE_APP', { duration: 100, intensity: 3 })
         document.getElementsByClassName('powercord-lettercount')[0].classList.add('powercord-lettercount-error');
       } else {
         document.getElementsByClassName('powercord-lettercount')[0].classList.remove('powercord-lettercount-error');
